@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Editor shell chrome
+- Authentication and route protection
 
 ## Current Goal
 
-- Feature `02-editor` is complete; ready for the next planned feature.
+- Feature `03-auth` is complete; ready for the next planned feature.
 
 ## Completed
 
@@ -24,8 +24,14 @@ Update this file whenever the current phase, active feature, or implementation s
   - `components/editor/editor-navbar.tsx` — fixed-height top navbar with left/center/right sections; sidebar toggle with `PanelLeftOpen` / `PanelLeftClose`
   - `components/editor/project-sidebar.tsx` — floating overlay sidebar (does not push content); slides from left; Projects header + close; My Projects / Shared tabs with empty placeholders; full-width New Project button
   - `components/editor/editor-shell.tsx` — wires navbar/sidebar open state over a full-viewport canvas placeholder
-  - Home page renders `EditorShell` for verification
   - Dialog pattern deferred: existing shadcn Dialog (title / description / footer) already token-themed; no dialogs built in this unit
+- Feature: `03-auth`
+  - Installed `@clerk/ui`; `ClerkProvider` wraps root layout with Clerk `dark` theme
+  - Appearance variables mapped to app CSS tokens in `lib/clerk-appearance.ts` (no hardcoded colors)
+  - `proxy.ts` at project root — public routes from `NEXT_PUBLIC_CLERK_SIGN_IN_URL` / `NEXT_PUBLIC_CLERK_SIGN_UP_URL`; all other routes protected by default
+  - Sign-in / sign-up pages with minimal two-panel `AuthShell` (form-only on small screens)
+  - `/` redirects authenticated users to `/editor`, unauthenticated to `/sign-in`
+  - Editor moved to `/editor`; Clerk `UserButton` in navbar right section
 
 ## In Progress
 
@@ -44,8 +50,9 @@ Update this file whenever the current phase, active feature, or implementation s
 - shadcn/ui style: `base-nova` with CSS variables
 - Generated `components/ui/*` left unmodified after install; theming via CSS tokens only
 - Editor sidebars are floating overlays — opening them must not push page content
+- Auth uses Clerk with root `proxy.ts` (not `middleware.ts`); public routes from `NEXT_PUBLIC_CLERK_SIGN_IN_URL` / `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
 
 ## Session Notes
 
-- Spec: `context/feature-specs/02-editor.md`
-- Verified: `tsc --noEmit` clean; `eslint` clean; dialog pattern ready via existing Dialog primitives
+- Spec: `context/feature-specs/03-auth.md`
+- Verified: `npm run build` passes; Proxy (Middleware) active; routes `/`, `/editor`, `/sign-in`, `/sign-up`

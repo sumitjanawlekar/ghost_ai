@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Authentication and route protection
+- Project dialogs and editor home
 
 ## Current Goal
 
-- Feature `03-auth` is complete; ready for the next planned feature.
+- Feature `04-project-dialogs` is complete; ready for the next planned feature.
 
 ## Completed
 
@@ -32,6 +32,14 @@ Update this file whenever the current phase, active feature, or implementation s
   - Sign-in / sign-up pages with minimal two-panel `AuthShell` (form-only on small screens)
   - `/` redirects authenticated users to `/editor`, unauthenticated to `/sign-in`
   - Editor moved to `/editor`; Clerk `UserButton` in navbar right section
+- Feature: `04-project-dialogs`
+  - `/editor` home empty state: heading, description, `New Project` button (no cards)
+  - `hooks/use-project-dialogs.ts` — dialog/form/loading state with mock projects and live slug preview
+  - `components/editor/project-dialogs.tsx` — Create / Rename / Delete dialogs
+  - Sidebar lists owned vs shared mock projects; rename/delete actions only on owned items
+  - Sidebar create + home `New Project` open Create dialog
+  - Mobile backdrop scrim closes sidebar on outside tap
+  - No API calls or persistence
 
 ## In Progress
 
@@ -51,8 +59,9 @@ Update this file whenever the current phase, active feature, or implementation s
 - Generated `components/ui/*` left unmodified after install; theming via CSS tokens only
 - Editor sidebars are floating overlays — opening them must not push page content
 - Auth uses Clerk with root `proxy.ts` (not `middleware.ts`); public routes from `NEXT_PUBLIC_CLERK_SIGN_IN_URL` / `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
+- Project dialogs use in-memory mock data until a projects API exists
 
 ## Session Notes
 
-- Spec: `context/feature-specs/03-auth.md`
-- Verified: `npm run build` passes; Proxy (Middleware) active; routes `/`, `/editor`, `/sign-in`, `/sign-up`
+- Spec: `context/feature-specs/04-project-dialogs.md`
+- Verified: `npm run build` passes; eslint clean on changed files

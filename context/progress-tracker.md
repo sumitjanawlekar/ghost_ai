@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Project dialogs and editor home
+- Database setup (Prisma)
 
 ## Current Goal
 
-- Feature `04-project-dialogs` is complete; ready for the next planned feature.
+- Feature `05-prisma` is complete; ready for the next planned feature.
 
 ## Completed
 
@@ -40,6 +40,13 @@ Update this file whenever the current phase, active feature, or implementation s
   - Sidebar create + home `New Project` open Create dialog
   - Mobile backdrop scrim closes sidebar on outside tap
   - No API calls or persistence
+- Feature: `05-prisma`
+  - Multi-file schema: `prisma/schema.prisma` + `prisma/models/project.prisma`
+  - `Project` model with `ownerId`, name, optional description, `ProjectStatus` (`DRAFT`/`ARCHIVED`), `canvasJsonPath`, timestamps, indexes on `ownerId` and `createdAt`
+  - `ProjectCollaborator` with cascade delete to `Project`, email, `createdAt`, unique `(projectId, email)`, indexes on `email` and `(projectId, createdAt)`
+  - `lib/prisma.ts` cached singleton: Accelerate for `prisma+postgres://`, else `@prisma/adapter-pg`
+  - Migrations `init_project` and `add_project_collaborator` applied; client generated to `app/generated/prisma`
+  - `prisma7.config.ts` schema path set to `prisma/` for multi-file support
 
 ## In Progress
 
@@ -60,8 +67,9 @@ Update this file whenever the current phase, active feature, or implementation s
 - Editor sidebars are floating overlays — opening them must not push page content
 - Auth uses Clerk with root `proxy.ts` (not `middleware.ts`); public routes from `NEXT_PUBLIC_CLERK_SIGN_IN_URL` / `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
 - Project dialogs use in-memory mock data until a projects API exists
+- Prisma 7 multi-file schema under `prisma/`; client singleton branches Accelerate vs `adapter-pg` by `DATABASE_URL` prefix
 
 ## Session Notes
 
-- Spec: `context/feature-specs/04-project-dialogs.md`
-- Verified: `npm run build` passes; eslint clean on changed files
+- Spec: `context/feature-specs/05-prisma.md`
+- Verified: both models migrated; `npm run build` passes

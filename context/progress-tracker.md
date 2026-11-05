@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Database setup (Prisma)
+- Project APIs
 
 ## Current Goal
 
-- Feature `05-prisma` is complete; ready for the next planned feature.
+- Feature `06-project-apis` is complete; ready for the next planned feature.
 
 ## Completed
 
@@ -47,6 +47,14 @@ Update this file whenever the current phase, active feature, or implementation s
   - `lib/prisma.ts` cached singleton: Accelerate for `prisma+postgres://`, else `@prisma/adapter-pg`
   - Migrations `init_project` and `add_project_collaborator` applied; client generated to `app/generated/prisma`
   - `prisma7.config.ts` schema path set to `prisma/` for multi-file support
+- Feature: `06-project-apis`
+  - `GET /api/projects` — lists projects owned by the authenticated Clerk user
+  - `POST /api/projects` — creates project with Clerk `ownerId`; defaults name to `Untitled Project`; uses schema `cuid()` IDs
+  - `PATCH /api/projects/[projectId]` — rename; owner-only (`403` for non-owners)
+  - `DELETE /api/projects/[projectId]` — delete; owner-only (`403` for non-owners)
+  - `lib/auth.ts` — `requireUserId()` returns `401` when unauthenticated
+  - `lib/project-access.ts` — `requireProjectOwner()` for rename/delete ownership checks
+  - Backend-only; UI not wired
 
 ## In Progress
 
@@ -54,7 +62,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Next Up
 
-- Continue with the next planned feature unit.
+- Wire project dialogs/UI to the project APIs
 
 ## Open Questions
 
@@ -68,8 +76,9 @@ Update this file whenever the current phase, active feature, or implementation s
 - Auth uses Clerk with root `proxy.ts` (not `middleware.ts`); public routes from `NEXT_PUBLIC_CLERK_SIGN_IN_URL` / `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
 - Project dialogs use in-memory mock data until a projects API exists
 - Prisma 7 multi-file schema under `prisma/`; client singleton branches Accelerate vs `adapter-pg` by `DATABASE_URL` prefix
+- Project rename/delete mutations are owner-only in the API layer (`403` for non-owners)
 
 ## Session Notes
 
-- Spec: `context/feature-specs/05-prisma.md`
-- Verified: both models migrated; `npm run build` passes
+- Spec: `context/feature-specs/06-project-apis.md`
+- Verified: routes registered; `npm run build` passes

@@ -82,3 +82,4 @@ Update this file whenever the current phase, active feature, or implementation s
 
 - Spec: `context/feature-specs/06-project-apis.md`
 - Verified: routes registered; `npm run build` passes
+- Create rejects malformed JSON with `400`; a JSON `null` body still defaults the name. Rename treats a `null` body as a missing name.

@@ -28,12 +28,14 @@ export async function POST(request: Request) {
     return authResult.response;
   }
 
-  let body: CreateProjectBody = {};
+  let parsed: unknown;
   try {
-    body = (await request.json()) as CreateProjectBody;
+    parsed = await request.json();
   } catch {
-    body = {};
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
+
+  const body: CreateProjectBody = parsed === null ? {} : (parsed as CreateProjectBody);
 
   const name =
     typeof body.name === "string" && body.name.trim().length > 0

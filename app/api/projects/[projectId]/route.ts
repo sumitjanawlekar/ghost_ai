@@ -28,14 +28,16 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  let body: RenameProjectBody;
+  let parsed: unknown;
   try {
-    body = (await request.json()) as RenameProjectBody;
+    parsed = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  if (typeof body.name !== "string" || body.name.trim().length === 0) {
+  const body = parsed as RenameProjectBody | null;
+
+  if (body === null || typeof body.name !== "string" || body.name.trim().length === 0) {
     return NextResponse.json(
       { error: "Name is required" },
       { status: 400 },

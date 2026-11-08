@@ -10,16 +10,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import type { useProjectDialogs } from "@/hooks/use-project-dialogs";
+import type { useProjectActions } from "@/hooks/use-project-actions";
 
-type ProjectDialogsProps = ReturnType<typeof useProjectDialogs>;
+type ProjectDialogsProps = ReturnType<typeof useProjectActions>;
 
 export function ProjectDialogs({
   dialogType,
-  activeProject,
+  targetProject,
   name,
-  slug,
+  roomId,
   loading,
+  error,
   close,
   handleNameChange,
   submit,
@@ -46,16 +47,14 @@ export function ProjectDialogs({
               onChange={(event) => handleNameChange(event.target.value)}
               autoFocus
             />
-            <p className="min-h-4 font-mono text-xs text-copy-muted">
-              {slug || ""}
-            </p>
+            <p className="min-h-4 font-mono text-xs text-copy-muted">{roomId}</p>
+            {error ? (
+              <p className="text-xs text-state-error">{error}</p>
+            ) : null}
           </div>
 
           <DialogFooter showCloseButton>
-            <Button
-              onClick={submit}
-              disabled={!name.trim() || !slug || loading}
-            >
+            <Button onClick={submit} disabled={!name.trim() || !roomId || loading}>
               {loading ? "Creating…" : "Create Project"}
             </Button>
           </DialogFooter>
@@ -67,25 +66,27 @@ export function ProjectDialogs({
           <DialogHeader>
             <DialogTitle>Rename Project</DialogTitle>
             <DialogDescription>
-              Renaming &ldquo;{activeProject?.name}&rdquo;
+              Renaming &ldquo;{targetProject?.name}&rdquo;
             </DialogDescription>
           </DialogHeader>
 
-          <Input
-            placeholder="Project name"
-            value={name}
-            onChange={(event) => handleNameChange(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && name.trim() && slug) submit();
-            }}
-            autoFocus
-          />
+          <div className="flex flex-col gap-2">
+            <Input
+              placeholder="Project name"
+              value={name}
+              onChange={(event) => handleNameChange(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && name.trim()) submit();
+              }}
+              autoFocus
+            />
+            {error ? (
+              <p className="text-xs text-state-error">{error}</p>
+            ) : null}
+          </div>
 
           <DialogFooter showCloseButton>
-            <Button
-              onClick={submit}
-              disabled={!name.trim() || !slug || loading}
-            >
+            <Button onClick={submit} disabled={!name.trim() || loading}>
               {loading ? "Saving…" : "Save"}
             </Button>
           </DialogFooter>
@@ -97,10 +98,12 @@ export function ProjectDialogs({
           <DialogHeader>
             <DialogTitle>Delete Project</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &ldquo;{activeProject?.name}
+              Are you sure you want to delete &ldquo;{targetProject?.name}
               &rdquo;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
+
+          {error ? <p className="text-xs text-state-error">{error}</p> : null}
 
           <DialogFooter showCloseButton>
             <Button variant="destructive" onClick={submit} disabled={loading}>

@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 
+import { Prisma } from "@/app/generated/prisma/client";
 import { requireUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isRoomId } from "@/lib/room-id";
 
 interface CreateProjectBody {
   name?: unknown;
   description?: unknown;
+  id?: unknown;
 }
 
 export async function GET() {
@@ -45,13 +48,33 @@ export async function POST(request: Request) {
   const description =
     typeof body.description === "string" ? body.description : undefined;
 
-  const project = await prisma.project.create({
-    data: {
-      ownerId: authResult.userId,
-      name,
-      description,
-    },
-  });
+  let id: string | undefined;
+  if (body.id !== undefined) {
+    if (typeof body.id !== "string" || !isRoomId(body.id.trim())) {
+      return NextResponse.json({ error: "Invalid room ID" }, { status: 400 });
+    }
+    id = body.id.trim();
+  }
 
-  return NextResponse.json(project, { status: 201 });
+  try {
+    const project = await prisma.project.create({
+      data: {
+        ...(id ? { id } : {}),
+        ownerId: authResult.userId,
+        name,
+        description,
+      },
+    });
+
+    return NextResponse.json(project, { status: 201 });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return NextResponse.json({ error: "Room ID already exists" }, { status: 409 });
+    }
+
+    throw error;
+  }
 }

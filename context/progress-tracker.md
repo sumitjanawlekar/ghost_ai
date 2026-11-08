@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Project APIs
+- Editor home wiring
 
 ## Current Goal
 
-- Feature `06-project-apis` is complete; ready for the next planned feature.
+- Feature `07-wire-editor-home` is complete; ready for the next planned feature.
 
 ## Completed
 
@@ -55,6 +55,14 @@ Update this file whenever the current phase, active feature, or implementation s
   - `lib/auth.ts` — `requireUserId()` returns `401` when unauthenticated
   - `lib/project-access.ts` — `requireProjectOwner()` for rename/delete ownership checks
   - Backend-only; UI not wired
+- Feature: `07-wire-editor-home`
+  - `lib/projects.ts` — `getEditorProjects()` loads owned projects and shared projects (collaborator email match) for the signed-in user
+  - `/editor` stays a server component and passes both lists into the sidebar; no client fetch on first load
+  - `hooks/use-project-actions.ts` — create, rename, and delete dialog state plus API mutations
+  - Create slugifies the name, appends a short unique suffix, sends that room ID as the project ID, then navigates to `/editor/[projectId]`
+  - Rename calls `PATCH` and refreshes; delete calls `DELETE`, redirects to `/editor` when the open workspace is removed, otherwise refreshes
+  - Create dialog shows the room ID preview; rename prefills the current name; delete shows the project name
+  - `POST /api/projects` accepts an optional room ID so the project ID and Liveblocks room ID stay aligned
 
 ## In Progress
 
@@ -62,7 +70,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Next Up
 
-- Wire project dialogs/UI to the project APIs
+- Not specified. Next feature spec has not been added.
 
 ## Open Questions
 
@@ -74,12 +82,15 @@ Update this file whenever the current phase, active feature, or implementation s
 - Generated `components/ui/*` left unmodified after install; theming via CSS tokens only
 - Editor sidebars are floating overlays — opening them must not push page content
 - Auth uses Clerk with root `proxy.ts` (not `middleware.ts`); public routes from `NEXT_PUBLIC_CLERK_SIGN_IN_URL` / `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
-- Project dialogs use in-memory mock data until a projects API exists
 - Prisma 7 multi-file schema under `prisma/`; client singleton branches Accelerate vs `adapter-pg` by `DATABASE_URL` prefix
 - Project rename/delete mutations are owner-only in the API layer (`403` for non-owners)
+- Editor project lists are loaded on the server. The project ID is the Liveblocks room ID (`slug` plus a short suffix)
+- Workspace route is `/editor/[projectId]`; only an owner or collaborator can open it
 
 ## Session Notes
 
-- Spec: `context/feature-specs/06-project-apis.md`
-- Verified: routes registered; `npm run build` passes
-- Create rejects malformed JSON with `400`; a JSON `null` body still defaults the name. Rename treats a `null` body as a missing name.
+- Spec: `context/feature-specs/07-wire-editor-home.md`
+- Verified: `npm run build` passes; `/editor` and `/editor/[projectId]` are dynamic routes
+- Shared projects are projects the current user's email is a collaborator on, excluding projects they own
+- Applied pending migrations `init_project` and `add_project_collaborator` to the current database before the editor query could run
+

@@ -27,11 +27,11 @@ export function isRoomId(value: string): boolean {
 }
 
 export function buildRoomId(name: string, suffix: string): string {
-  const slug = slugifyProjectName(name);
-  if (!slug || !isRoomId(suffix)) {
+  if (!name.trim() || !isRoomId(suffix)) {
     return "";
   }
 
+  const slug = slugifyProjectName(name) || "project";
   const roomId = `${slug}-${suffix}`;
   return isRoomId(roomId) ? roomId : "";
 }

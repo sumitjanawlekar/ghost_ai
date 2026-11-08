@@ -16,6 +16,7 @@ export async function getEditorProjects(): Promise<EditorProjects> {
   }
 
   const emails = (user.emailAddresses ?? [])
+    .filter((address) => address.verification?.status === "verified")
     .map((address) => address.emailAddress.trim())
     .filter((email) => email.length > 0);
 

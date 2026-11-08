@@ -1,21 +1,23 @@
 "use client";
 
 import { Pencil, Plus, Trash2, X } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Project } from "@/hooks/use-project-dialogs";
 import { cn } from "@/lib/utils";
+import type { ProjectSummary } from "@/types/project";
 
 interface ProjectSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  ownedProjects: Project[];
-  sharedProjects: Project[];
+  ownedProjects: ProjectSummary[];
+  sharedProjects: ProjectSummary[];
+  activeProjectId?: string;
   onNewProject: () => void;
-  onRename: (project: Project) => void;
-  onDelete: (project: Project) => void;
+  onRename: (project: ProjectSummary) => void;
+  onDelete: (project: ProjectSummary) => void;
   className?: string;
 }
 
@@ -31,17 +33,27 @@ function EmptyProjectsPlaceholder({ label }: { label: string }) {
 }
 
 interface ProjectItemProps {
-  project: Project;
-  onRename?: (project: Project) => void;
-  onDelete?: (project: Project) => void;
+  project: ProjectSummary;
+  isActive: boolean;
+  onRename?: (project: ProjectSummary) => void;
+  onDelete?: (project: ProjectSummary) => void;
 }
 
-function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
+function ProjectItem({ project, isActive, onRename, onDelete }: ProjectItemProps) {
   return (
-    <div className="group flex items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-subtle">
-      <span className="min-w-0 flex-1 truncate text-sm text-copy-secondary group-hover:text-copy-primary">
+    <div
+      className={cn(
+        "group flex items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-subtle",
+        isActive && "bg-subtle",
+      )}
+    >
+      <Link
+        href={`/editor/${project.id}`}
+        aria-current={isActive ? "page" : undefined}
+        className="min-w-0 flex-1 truncate text-sm text-copy-secondary group-hover:text-copy-primary"
+      >
         {project.name}
-      </span>
+      </Link>
       {onRename && onDelete ? (
         <div className="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
           <Button
@@ -73,6 +85,7 @@ export function ProjectSidebar({
   onClose,
   ownedProjects,
   sharedProjects,
+  activeProjectId,
   onNewProject,
   onRename,
   onDelete,
@@ -93,7 +106,7 @@ export function ProjectSidebar({
         className={cn(
           "fixed top-12 bottom-0 left-0 z-40 flex w-72 flex-col border-r border-surface-border bg-surface/95 backdrop-blur-sm transition-transform duration-200 ease-out",
           isOpen ? "translate-x-0" : "-translate-x-full pointer-events-none",
-          className
+          className,
         )}
       >
         <div className="flex h-12 shrink-0 items-center justify-between border-b border-surface-border px-3">
@@ -133,6 +146,7 @@ export function ProjectSidebar({
                     <li key={project.id}>
                       <ProjectItem
                         project={project}
+                        isActive={project.id === activeProjectId}
                         onRename={onRename}
                         onDelete={onDelete}
                       />
@@ -151,7 +165,10 @@ export function ProjectSidebar({
                 <ul className="flex flex-col gap-0.5 p-2">
                   {sharedProjects.map((project) => (
                     <li key={project.id}>
-                      <ProjectItem project={project} />
+                      <ProjectItem
+                        project={project}
+                        isActive={project.id === activeProjectId}
+                      />
                     </li>
                   ))}
                 </ul>

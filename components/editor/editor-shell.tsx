@@ -7,14 +7,27 @@ import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectDialogs } from "@/components/editor/project-dialogs";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
 import { Button } from "@/components/ui/button";
-import { useProjectDialogs } from "@/hooks/use-project-dialogs";
+import { useProjectActions } from "@/hooks/use-project-actions";
+import type { ProjectSummary } from "@/types/project";
 
-export function EditorShell() {
+interface EditorShellProps {
+  ownedProjects: ProjectSummary[];
+  sharedProjects: ProjectSummary[];
+  activeProjectId?: string;
+}
+
+export function EditorShell({
+  ownedProjects,
+  sharedProjects,
+  activeProjectId,
+}: EditorShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const dialogs = useProjectDialogs();
-
-  const ownedProjects = dialogs.projects.filter((project) => project.owned);
-  const sharedProjects = dialogs.projects.filter((project) => !project.owned);
+  const actions = useProjectActions(activeProjectId ?? null);
+  const activeProject = activeProjectId
+    ? [...ownedProjects, ...sharedProjects].find(
+        (project) => project.id === activeProjectId,
+      )
+    : undefined;
 
   return (
     <div className="relative flex h-dvh min-h-0 flex-col bg-base">
@@ -29,31 +42,41 @@ export function EditorShell() {
           onClose={() => setIsSidebarOpen(false)}
           ownedProjects={ownedProjects}
           sharedProjects={sharedProjects}
-          onNewProject={dialogs.openCreate}
-          onRename={dialogs.openRename}
-          onDelete={dialogs.openDelete}
+          activeProjectId={activeProjectId}
+          onNewProject={actions.openCreate}
+          onRename={actions.openRename}
+          onDelete={actions.openDelete}
         />
 
         <main className="flex h-full w-full items-center justify-center bg-base px-4">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <div className="flex flex-col gap-1">
+          {activeProject ? (
+            <div className="flex flex-col items-center gap-1 text-center">
+              <p className="text-sm text-copy-muted">Workspace</p>
               <h1 className="text-xl font-medium text-copy-primary">
-                Create a project or open an existing one
+                {activeProject.name}
               </h1>
-              <p className="text-sm text-copy-muted">
-                Start a new architecture workspace, or choose a project from the
-                sidebar.
-              </p>
             </div>
-            <Button type="button" onClick={dialogs.openCreate}>
-              <Plus className="h-4 w-4" data-icon="inline-start" />
-              New Project
-            </Button>
-          </div>
+          ) : (
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="flex flex-col gap-1">
+                <h1 className="text-xl font-medium text-copy-primary">
+                  Create a project or open an existing one
+                </h1>
+                <p className="text-sm text-copy-muted">
+                  Start a new architecture workspace, or choose a project from the
+                  sidebar.
+                </p>
+              </div>
+              <Button type="button" onClick={actions.openCreate}>
+                <Plus className="h-4 w-4" data-icon="inline-start" />
+                New Project
+              </Button>
+            </div>
+          )}
         </main>
       </div>
 
-      <ProjectDialogs {...dialogs} />
+      <ProjectDialogs {...actions} />
     </div>
   );
 }

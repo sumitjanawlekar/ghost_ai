@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Editor home wiring
+- Editor workspace shell
 
 ## Current Goal
 
-- Feature `07-wire-editor-home` is complete; ready for the next planned feature.
+- Feature `08-editor-workspace-shell` is complete; ready for the next planned feature.
 
 ## Completed
 
@@ -63,6 +63,14 @@ Update this file whenever the current phase, active feature, or implementation s
   - Rename calls `PATCH` and refreshes; delete calls `DELETE`, redirects to `/editor` when the open workspace is removed, otherwise refreshes
   - Create dialog shows the room ID preview; rename prefills the current name; delete shows the project name
   - `POST /api/projects` accepts an optional room ID so the project ID and Liveblocks room ID stay aligned
+- Feature: `08-editor-workspace-shell`
+  - Workspace route renamed to `/editor/[roomId]` (param `roomId`; project ID remains the room ID)
+  - Server component access checks: unauthenticated → `/sign-in`; missing/unauthorized → `AccessDenied`
+  - `components/editor/access-denied.tsx` — centered lock state with link back to `/editor`
+  - `lib/project-access.ts` — `getCurrentIdentity()` (Clerk `userId` + primary email) and `getAccessibleProject()` (owner or collaborator); keeps `requireProjectOwner()` for APIs
+  - Workspace layout: navbar shows project name with share + AI sidebar toggles (no real share/AI behavior yet)
+  - Left `ProjectSidebar` highlights the current room; center canvas placeholder; right `AiSidebar` placeholder
+  - No canvas logic, Liveblocks, AI chat, or sharing behavior
 
 ## In Progress
 
@@ -85,12 +93,13 @@ Update this file whenever the current phase, active feature, or implementation s
 - Prisma 7 multi-file schema under `prisma/`; client singleton branches Accelerate vs `adapter-pg` by `DATABASE_URL` prefix
 - Project rename/delete mutations are owner-only in the API layer (`403` for non-owners)
 - Editor project lists are loaded on the server. The project ID is the Liveblocks room ID (`slug` plus a short suffix)
-- Workspace route is `/editor/[projectId]`; only an owner or collaborator can open it
+- Workspace route is `/editor/[roomId]`; only an owner or collaborator can open it; missing/unauthorized rooms render `AccessDenied` (not a redirect)
+- Workspace access helpers live in `lib/project-access.ts` outside the page component
 
 ## Session Notes
 
-- Spec: `context/feature-specs/07-wire-editor-home.md`
-- Verified: `npm run build` passes; `/editor` and `/editor/[projectId]` are dynamic routes
-- Shared projects are projects the current user's email is a collaborator on, excluding projects they own
-- Applied pending migrations `init_project` and `add_project_collaborator` to the current database before the editor query could run
+- Spec: `context/feature-specs/08-editor-workspace-shell.md`
+- Verified: `npm run build` passes; `/editor` and `/editor/[roomId]` are dynamic routes; no TypeScript errors
+- Renamed `app/editor/[projectId]` → `app/editor/[roomId]` and updated related `activeRoomId` props
+- Share and AI sidebar controls are UI placeholders only
 

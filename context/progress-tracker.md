@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Editor workspace shell
+- Share dialog
 
 ## Current Goal
 
-- Feature `08-editor-workspace-shell` is complete; ready for the next planned feature.
+- Feature `09-share-dialog` is complete; ready for the next planned feature.
 
 ## Completed
 
@@ -71,6 +71,12 @@ Update this file whenever the current phase, active feature, or implementation s
   - Workspace layout: navbar shows project name with share + AI sidebar toggles (no real share/AI behavior yet)
   - Left `ProjectSidebar` highlights the current room; center canvas placeholder; right `AiSidebar` placeholder
   - No canvas logic, Liveblocks, AI chat, or sharing behavior
+- Feature: `09-share-dialog`
+  - Workspace navbar Share opens `components/editor/share-dialog.tsx`
+  - `GET/POST/DELETE /api/projects/[projectId]/collaborators` — members can list; invite/remove are owner-only
+  - Collaborators stored by email only (no local user table); `lib/clerk-users.ts` enriches name/avatar via Clerk Backend API, falling back to email
+  - Owners: invite by email, remove, copy project link with temporary `Copied!` feedback
+  - Collaborators: read-only collaborator list (no invite/remove/copy controls)
 
 ## In Progress
 
@@ -95,11 +101,12 @@ Update this file whenever the current phase, active feature, or implementation s
 - Editor project lists are loaded on the server. The project ID is the Liveblocks room ID (`slug` plus a short suffix)
 - Workspace route is `/editor/[roomId]`; only an owner or collaborator can open it; missing/unauthorized rooms render `AccessDenied` (not a redirect)
 - Workspace access helpers live in `lib/project-access.ts` outside the page component
+- Collaborator invite/remove are owner-only at the API layer; listing requires project membership
+- Collaborator profile enrichment uses Clerk Backend API by email; missing Clerk users show email only
 
 ## Session Notes
 
-- Spec: `context/feature-specs/08-editor-workspace-shell.md`
-- Verified: `npm run build` passes; `/editor` and `/editor/[roomId]` are dynamic routes; no TypeScript errors
-- Renamed `app/editor/[projectId]` → `app/editor/[roomId]` and updated related `activeRoomId` props
-- Share and AI sidebar controls are UI placeholders only
+- Spec: `context/feature-specs/09-share-dialog.md`
+- Verified: `npm run build` passes; `/api/projects/[projectId]/collaborators` route registered
+- Share dialog wired from workspace navbar; AI sidebar remains a placeholder
 

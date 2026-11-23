@@ -7,6 +7,7 @@ import { AiSidebar } from "@/components/editor/ai-sidebar";
 import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectDialogs } from "@/components/editor/project-dialogs";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
+import { ShareDialog } from "@/components/editor/share-dialog";
 import { Button } from "@/components/ui/button";
 import { useProjectActions } from "@/hooks/use-project-actions";
 import type { ProjectSummary } from "@/types/project";
@@ -26,6 +27,7 @@ export function EditorShell({
 }: EditorShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAiSidebarOpen, setIsAiSidebarOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const actions = useProjectActions(activeRoomId ?? null);
   const isWorkspace = Boolean(activeRoomId && projectName);
 
@@ -39,7 +41,7 @@ export function EditorShell({
         onToggleAiSidebar={
           isWorkspace ? () => setIsAiSidebarOpen((open) => !open) : undefined
         }
-        onShare={isWorkspace ? () => undefined : undefined}
+        onShare={isWorkspace ? () => setIsShareOpen(true) : undefined}
       />
 
       <div className="relative min-h-0 flex-1">
@@ -87,6 +89,15 @@ export function EditorShell({
       </div>
 
       <ProjectDialogs {...actions} />
+
+      {isWorkspace && activeRoomId && projectName ? (
+        <ShareDialog
+          open={isShareOpen}
+          onOpenChange={setIsShareOpen}
+          roomId={activeRoomId}
+          projectName={projectName}
+        />
+      ) : null}
     </div>
   );
 }

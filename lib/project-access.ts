@@ -83,3 +83,48 @@ export async function requireProjectOwner(projectId: string, userId: string) {
 
   return { project };
 }
+
+export async function requireProjectMember(
+  projectId: string,
+  userId: string,
+  email: string | null,
+) {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: {
+      id: true,
+      name: true,
+      ownerId: true,
+      collaborators: email
+        ? {
+            where: {
+              email: { equals: email, mode: "insensitive" as const },
+            },
+            select: { id: true },
+            take: 1,
+          }
+        : false,
+    },
+  });
+
+  if (!project) {
+    return { error: "not_found" as const };
+  }
+
+  const isOwner = project.ownerId === userId;
+  const isCollaborator =
+    Array.isArray(project.collaborators) && project.collaborators.length > 0;
+
+  if (!isOwner && !isCollaborator) {
+    return { error: "forbidden" as const };
+  }
+
+  return {
+    project: {
+      id: project.id,
+      name: project.name,
+      ownerId: project.ownerId,
+    },
+    isOwner,
+  };
+}

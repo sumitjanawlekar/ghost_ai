@@ -22,24 +22,28 @@ export async function getClerkProfilesByEmails(
     return profiles;
   }
 
-  const client = await clerkClient();
-  const { data } = await client.users.getUserList({
-    emailAddress: uniqueEmails,
-    limit: Math.min(uniqueEmails.length, 100),
-  });
+  try {
+    const client = await clerkClient();
+    const { data } = await client.users.getUserList({
+      emailAddress: uniqueEmails,
+      limit: Math.min(uniqueEmails.length, 100),
+    });
 
-  for (const user of data) {
-    const profile: ClerkEmailProfile = {
-      name: user.fullName?.trim() || user.username?.trim() || null,
-      imageUrl: user.imageUrl || null,
-    };
+    for (const user of data) {
+      const profile: ClerkEmailProfile = {
+        name: user.fullName?.trim() || user.username?.trim() || null,
+        imageUrl: user.imageUrl || null,
+      };
 
-    for (const address of user.emailAddresses ?? []) {
-      const key = address.emailAddress.trim().toLowerCase();
-      if (uniqueEmails.includes(key)) {
-        profiles.set(key, profile);
+      for (const address of user.emailAddresses ?? []) {
+        const key = address.emailAddress.trim().toLowerCase();
+        if (uniqueEmails.includes(key)) {
+          profiles.set(key, profile);
+        }
       }
     }
+  } catch (error) {
+    console.error("Failed to look up Clerk user profiles by email:", error);
   }
 
   return profiles;

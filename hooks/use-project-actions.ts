@@ -21,7 +21,7 @@ async function readErrorMessage(response: Response, fallback: string) {
   return fallback;
 }
 
-export function useProjectActions(activeProjectId: string | null = null) {
+export function useProjectActions(activeRoomId: string | null = null) {
   const router = useRouter();
   const [dialogType, setDialogType] = useState<DialogType>(null);
   const [targetProject, setTargetProject] = useState<ProjectSummary | null>(null);
@@ -139,7 +139,7 @@ export function useProjectActions(activeProjectId: string | null = null) {
         const deletedId = targetProject.id;
         setDialogType(null);
 
-        if (activeProjectId && activeProjectId === deletedId) {
+        if (activeRoomId && activeRoomId === deletedId) {
           router.replace("/editor");
           return;
         }

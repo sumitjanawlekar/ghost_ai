@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Editor home wiring
+- Share dialog
 
 ## Current Goal
 
-- Feature `07-wire-editor-home` is complete; ready for the next planned feature.
+- Feature `09-share-dialog` is complete; ready for the next planned feature.
 
 ## Completed
 
@@ -63,6 +63,20 @@ Update this file whenever the current phase, active feature, or implementation s
   - Rename calls `PATCH` and refreshes; delete calls `DELETE`, redirects to `/editor` when the open workspace is removed, otherwise refreshes
   - Create dialog shows the room ID preview; rename prefills the current name; delete shows the project name
   - `POST /api/projects` accepts an optional room ID so the project ID and Liveblocks room ID stay aligned
+- Feature: `08-editor-workspace-shell`
+  - Workspace route renamed to `/editor/[roomId]` (param `roomId`; project ID remains the room ID)
+  - Server component access checks: unauthenticated → `/sign-in`; missing/unauthorized → `AccessDenied`
+  - `components/editor/access-denied.tsx` — centered lock state with link back to `/editor`
+  - `lib/project-access.ts` — `getCurrentIdentity()` (Clerk `userId` + primary email) and `getAccessibleProject()` (owner or collaborator); keeps `requireProjectOwner()` for APIs
+  - Workspace layout: navbar shows project name with share + AI sidebar toggles (no real share/AI behavior yet)
+  - Left `ProjectSidebar` highlights the current room; center canvas placeholder; right `AiSidebar` placeholder
+  - No canvas logic, Liveblocks, AI chat, or sharing behavior
+- Feature: `09-share-dialog`
+  - Workspace navbar Share opens `components/editor/share-dialog.tsx`
+  - `GET/POST/DELETE /api/projects/[projectId]/collaborators` — members can list; invite/remove are owner-only
+  - Collaborators stored by email only (no local user table); `lib/clerk-users.ts` enriches name/avatar via Clerk Backend API, falling back to email
+  - Owners: invite by email, remove, copy project link with temporary `Copied!` feedback
+  - Collaborators: read-only collaborator list (no invite/remove/copy controls)
 
 ## In Progress
 
@@ -85,12 +99,14 @@ Update this file whenever the current phase, active feature, or implementation s
 - Prisma 7 multi-file schema under `prisma/`; client singleton branches Accelerate vs `adapter-pg` by `DATABASE_URL` prefix
 - Project rename/delete mutations are owner-only in the API layer (`403` for non-owners)
 - Editor project lists are loaded on the server. The project ID is the Liveblocks room ID (`slug` plus a short suffix)
-- Workspace route is `/editor/[projectId]`; only an owner or collaborator can open it
+- Workspace route is `/editor/[roomId]`; only an owner or collaborator can open it; missing/unauthorized rooms render `AccessDenied` (not a redirect)
+- Workspace access helpers live in `lib/project-access.ts` outside the page component
+- Collaborator invite/remove are owner-only at the API layer; listing requires project membership
+- Collaborator profile enrichment uses Clerk Backend API by email; missing Clerk users show email only
 
 ## Session Notes
 
-- Spec: `context/feature-specs/07-wire-editor-home.md`
-- Verified: `npm run build` passes; `/editor` and `/editor/[projectId]` are dynamic routes
-- Shared projects are projects the current user's email is a collaborator on, excluding projects they own
-- Applied pending migrations `init_project` and `add_project_collaborator` to the current database before the editor query could run
+- Spec: `context/feature-specs/09-share-dialog.md`
+- Verified: `npm run build` passes; `/api/projects/[projectId]/collaborators` route registered
+- Share dialog wired from workspace navbar; AI sidebar remains a placeholder
 

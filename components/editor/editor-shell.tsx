@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 
+import { AiSidebar } from "@/components/editor/ai-sidebar";
 import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectDialogs } from "@/components/editor/project-dialogs";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
+import { ShareDialog } from "@/components/editor/share-dialog";
 import { Button } from "@/components/ui/button";
 import { useProjectActions } from "@/hooks/use-project-actions";
 import type { ProjectSummary } from "@/types/project";
@@ -13,27 +15,33 @@ import type { ProjectSummary } from "@/types/project";
 interface EditorShellProps {
   ownedProjects: ProjectSummary[];
   sharedProjects: ProjectSummary[];
-  activeProjectId?: string;
+  activeRoomId?: string;
+  projectName?: string;
 }
 
 export function EditorShell({
   ownedProjects,
   sharedProjects,
-  activeProjectId,
+  activeRoomId,
+  projectName,
 }: EditorShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const actions = useProjectActions(activeProjectId ?? null);
-  const activeProject = activeProjectId
-    ? [...ownedProjects, ...sharedProjects].find(
-        (project) => project.id === activeProjectId,
-      )
-    : undefined;
+  const [isAiSidebarOpen, setIsAiSidebarOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const actions = useProjectActions(activeRoomId ?? null);
+  const isWorkspace = Boolean(activeRoomId && projectName);
 
   return (
     <div className="relative flex h-dvh min-h-0 flex-col bg-base">
       <EditorNavbar
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
+        projectName={projectName}
+        isAiSidebarOpen={isAiSidebarOpen}
+        onToggleAiSidebar={
+          isWorkspace ? () => setIsAiSidebarOpen((open) => !open) : undefined
+        }
+        onShare={isWorkspace ? () => setIsShareOpen(true) : undefined}
       />
 
       <div className="relative min-h-0 flex-1">
@@ -42,20 +50,17 @@ export function EditorShell({
           onClose={() => setIsSidebarOpen(false)}
           ownedProjects={ownedProjects}
           sharedProjects={sharedProjects}
-          activeProjectId={activeProjectId}
+          activeRoomId={activeRoomId}
           onNewProject={actions.openCreate}
           onRename={actions.openRename}
           onDelete={actions.openDelete}
         />
 
         <main className="flex h-full w-full items-center justify-center bg-base px-4">
-          {activeProject ? (
-            <div className="flex flex-col items-center gap-1 text-center">
-              <p className="text-sm text-copy-muted">Workspace</p>
-              <h1 className="text-xl font-medium text-copy-primary">
-                {activeProject.name}
-              </h1>
-            </div>
+          {isWorkspace ? (
+            <p className="text-sm text-copy-muted">
+              Canvas workspace — design surface coming soon
+            </p>
           ) : (
             <div className="flex flex-col items-center gap-4 text-center">
               <div className="flex flex-col gap-1">
@@ -74,9 +79,25 @@ export function EditorShell({
             </div>
           )}
         </main>
+
+        {isWorkspace ? (
+          <AiSidebar
+            isOpen={isAiSidebarOpen}
+            onClose={() => setIsAiSidebarOpen(false)}
+          />
+        ) : null}
       </div>
 
       <ProjectDialogs {...actions} />
+
+      {isWorkspace && activeRoomId && projectName ? (
+        <ShareDialog
+          open={isShareOpen}
+          onOpenChange={setIsShareOpen}
+          roomId={activeRoomId}
+          projectName={projectName}
+        />
+      ) : null}
     </div>
   );
 }

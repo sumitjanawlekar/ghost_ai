@@ -14,7 +14,7 @@ interface ProjectSidebarProps {
   onClose: () => void;
   ownedProjects: ProjectSummary[];
   sharedProjects: ProjectSummary[];
-  activeProjectId?: string;
+  activeRoomId?: string;
   onNewProject: () => void;
   onRename: (project: ProjectSummary) => void;
   onDelete: (project: ProjectSummary) => void;
@@ -85,7 +85,7 @@ export function ProjectSidebar({
   onClose,
   ownedProjects,
   sharedProjects,
-  activeProjectId,
+  activeRoomId,
   onNewProject,
   onRename,
   onDelete,
@@ -146,7 +146,7 @@ export function ProjectSidebar({
                     <li key={project.id}>
                       <ProjectItem
                         project={project}
-                        isActive={project.id === activeProjectId}
+                        isActive={project.id === activeRoomId}
                         onRename={onRename}
                         onDelete={onDelete}
                       />
@@ -167,7 +167,7 @@ export function ProjectSidebar({
                     <li key={project.id}>
                       <ProjectItem
                         project={project}
-                        isActive={project.id === activeProjectId}
+                        isActive={project.id === activeRoomId}
                       />
                     </li>
                   ))}

@@ -1,10 +1,7 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextRequest } from "next/server";
 
-console.log("in proxy");
-
 function isPublicAuthRoute(req: NextRequest) {
-  console.log("in isPublicAuthRoute");
   const pathname = req.nextUrl.pathname;
   const signInUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in";
   const signUpUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? "/sign-up";
